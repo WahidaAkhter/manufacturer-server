@@ -37,6 +37,8 @@ async function run(){
         await client.connect();
         const serviceCollection = client.db('warbitor').collection('services');
         const userCollection = client.db('warbitor').collection('users');
+        const purchaseCollection = client.db('warbitor').collection('purchases');
+
 
         app.get('/service', async(_req, res) =>{
             const query = {};
@@ -58,6 +60,11 @@ async function run(){
             res.send({ result, token });
           })
       
+          app.post('/purchase',async(req,res)=>{
+            const purchase=req.body;
+            const result=await purchaseCollection.insertOne(purchase);
+            res.send(result);
+          })
 
 
     }
