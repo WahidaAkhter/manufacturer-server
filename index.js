@@ -76,10 +76,17 @@ async function run(){
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
             res.send({ result, token });
           })
+
+          app.get('/purchaseModal', async(req, res) =>{
+            const customer = req.query.customer;
+            const query = {customer: customer};
+            const purchaseModals = await purchaseModalCollection.find(query).toArray();
+            res.send(purchaseModals);
+          })
       
           app.post('/purchaseModal', async (req, res) => {
             const purchaseModal = req.body;
-            const query = { purchase: purchaseModal.purchase, date: purchaseModal.date, user: purchaseModal.user }
+            const query = { purchase: purchaseModal.purchase, date: purchaseModal.date, customer: purchaseModal.customer }
             const exists = await purchaseModalCollection.findOne(query);
             if (exists) {
               return res.send({ success: false, purchaseModal: exists })
