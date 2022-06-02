@@ -64,6 +64,11 @@ async function run(){
           res.send(services); 
         })
 
+        app.get('/user', verifyJWT, async (req, res) => {
+          const users = await userCollection.find().toArray();
+          res.send(users);
+        });
+
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
@@ -77,11 +82,18 @@ async function run(){
             res.send({ result, token });
           })
 
-          app.get('/purchaseModal', async(req, res) =>{
+          app.get('/purchaseModal',verifyJWT, async(req, res) =>{
             const customer = req.query.customer;
-            const query = {customer: customer};
-            const purchaseModals = await purchaseModalCollection.find(query).toArray();
-            res.send(purchaseModals);
+            const decodedEmail = req.decoded.email;
+            if (customer === decodedEmail){
+              const query = {customer: customer};
+              const purchaseModals = await purchaseModalCollection.find(query).toArray();
+              res.send(purchaseModals);
+            }
+            else {
+              return res.status(403).send({ message: 'forbidden access' });
+            }
+           
           })
       
           app.post('/purchaseModal', async (req, res) => {
