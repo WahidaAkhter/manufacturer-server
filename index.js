@@ -37,7 +37,7 @@ async function run(){
         await client.connect();
         const serviceCollection = client.db('warbitor').collection('services');
         const userCollection = client.db('warbitor').collection('users');
-        const purchaseCollection = client.db('warbitor').collection('purchases');
+        const purchaseModalCollection = client.db('warbitor').collection('purchaseModals');
 
 
         app.get('/service', async(_req, res) =>{
@@ -60,14 +60,19 @@ async function run(){
             res.send({ result, token });
           })
       
-          app.post('/purchase',async(req,res)=>{
-            const purchase=req.body;
-            const result=await purchaseCollection.insertOne(purchase);
-            res.send(result);
+          app.post('/purchaseModal', async (req, res) => {
+            const purchaseModal = req.body;
+            const query = { purchase: purchaseModal.purchase, date: purchaseModal.date, user: purchaseModal.user }
+            const exists = await purchaseModalCollection.findOne(query);
+            if (exists) {
+              return res.send({ success: false, purchaseModal: exists })
+            }
+            const result = await purchaseModalCollection.insertOne(purchaseModal);
+            return res.send({ success: true, result });
           })
+      
+        }
 
-
-    }
     finally{
 
     }
