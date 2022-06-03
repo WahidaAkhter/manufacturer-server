@@ -39,6 +39,7 @@ async function run(){
         const serviceCollection = client.db('warbitor').collection('services');
         const userCollection = client.db('warbitor').collection('users');
         const purchaseModalCollection = client.db('warbitor').collection('purchaseModals');
+        const paymentCollection = client.db('warbitor').collection('payments');
 
         app.post('/create-payment-intent', verifyJWT, async(req, res) =>{
           const service = req.body;
@@ -130,6 +131,22 @@ async function run(){
             const query = {id: ObjectId(id)};
             const purchaseModal = await purchaseModalCollection.findOne(query);
             res.send(purchaseModal);
+          })
+
+          app.patch('/purchaseModal/:id', verifyJWT, async(req, res) =>{
+            const id  = req.params.id;
+            const payment = req.body;
+            const filter = {id: ObjectId(id)};
+            const updatedDoc = {
+              $set: {
+                paid: true,
+                transactionId: payment.transactionId
+              }
+            }
+      
+            const result = await paymentCollection.insertOne(payment);
+            const updatedBooking = await purchaseModalCollection.updateOne(filter, updatedDoc);
+            res.send(updatedBooking);
           })
       
           app.post('/purchaseModal', async (req, res) => {
