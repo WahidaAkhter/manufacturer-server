@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -112,6 +112,12 @@ async function run(){
               return res.status(403).send({ message: 'forbidden access' });
             }
            
+          })
+          app.get('/purchaseModal/:id', verifyJWT, async(req, res) =>{
+            const id = req.params.id;
+            const query = {id: ObjectId(id)};
+            const purchaseModal = await purchaseModalCollection.findOne(query);
+            res.send(purchaseModal);
           })
       
           app.post('/purchaseModal', async (req, res) => {
