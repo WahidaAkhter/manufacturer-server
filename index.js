@@ -147,6 +147,8 @@ async function run(){
             const result = await paymentCollection.insertOne(payment);
             const updatedBooking = await purchaseModalCollection.updateOne(filter, updatedDoc);
             res.send(updatedBooking);
+
+            
           })
       
           app.post('/purchaseModal', async (req, res) => {
